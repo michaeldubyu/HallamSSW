@@ -1,0 +1,5 @@
+*.o
+example_c
+example_cpp
+ssw_test
+hallam_SSW_test
