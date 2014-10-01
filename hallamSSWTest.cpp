@@ -17,6 +17,7 @@ typedef struct _AlignmentDetails {
 static void readQueryAndTargets(const char* queryFile, const char* targetFile);
 static void printHeader();
 static void printDetails(const Details& details);
+static size_t computeIdentity(const Details& details); 
 
 static const char TAB = '\t';
 
@@ -110,10 +111,31 @@ static void printHeader() {
     std::cout << std::endl;
 }
 
+static size_t computeIdentity(const Details& details) {
+    return 0;
+}
+
 static void printDetails(const Details& details) {
 
+    size_t identity = 0;
+    size_t gaps = 0;
+    size_t alignmentSize = details.aln->ref_end - details.aln->ref_begin;
+    size_t mismatches = details.aln->mismatches;
+    double bitScore = 0;
+    double evalue = 0;
+
     std::cout << details.queryName << TAB
-              << details.targetName << TAB;
+              << details.targetName << TAB
+              << identity << TAB
+              << alignmentSize << TAB
+              << mismatches << TAB
+              << gaps << TAB
+              << details.aln->query_begin << TAB
+              << details.aln->query_end << TAB
+              << details.aln->ref_begin << TAB
+              << details.aln->ref_end << TAB
+              << evalue << TAB
+              << bitScore;
 
     std::cout << std::endl;
 }
