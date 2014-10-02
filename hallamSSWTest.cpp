@@ -16,12 +16,12 @@ typedef struct _AlignmentDetails {
 } Details;
 
 static void align(const std::string& queryFileString, const std::string& targetFileString);
-static std::string readIn(const char* file); 
 static void printHeader();
 static void printDetails(const Details& details);
+static std::string readIn(const char* file); 
+static int32_t computeIdentity(const Details& details); 
 
 static const char TAB = '\t';
-
 
 int main(int argc, char** argv) {
     // parse parameters
@@ -41,6 +41,8 @@ int main(int argc, char** argv) {
     const std::string targetString = readIn(targetFile);
 
     align(queryString, targetString);
+
+    return EXIT_SUCCESS;
 }
 
 // read contents of the file into a string
@@ -118,14 +120,31 @@ static void printHeader() {
     std::cout << std::endl;
 }
 
+static int32_t computeIdentity(const Details& details) {
+    int32_t count = 0;
+    for (int32_t i = 0; i < details.querySequence.size() ; i++) {
+        if ((details.aln->query_begin == details.aln->query_begin) || 
+            (details.aln->ref_begin == details.aln->ref_end)) return 0;
+
+        if (details.aln->query_begin + i <= details.aln->query_end && 
+            details.aln->ref_begin + i <= details.aln->ref_end) {
+           
+            if (details.querySequence.at(details.aln->query_begin + i) == details.targetSequence.at(details.aln->ref_begin + i)) {
+                count++;
+            }
+        }
+    }
+    return count;
+}
+
 static void printDetails(const Details& details) {
 
-    size_t alignmentSize = details.aln->ref_end - details.aln->ref_begin;
-    size_t mismatches = details.aln->mismatches;
+    int32_t alignmentSize = details.aln->ref_end - details.aln->ref_begin;
+    int32_t mismatches = details.aln->mismatches;
+    double bitScore = details.aln->sw_score;
     
-    size_t identity = 0;
-    size_t gaps = 0;
-    double bitScore = 0;
+    int32_t identity = computeIdentity(details);
+    int32_t gaps = details.aln->ref_end - details.aln->ref_begin - mismatches - identity;
     double evalue = 0;
 
     std::cout << details.queryName << TAB

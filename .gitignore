@@ -1,4 +1,6 @@
 *.o
+*.so
+*.so.*
 example_c
 example_cpp
 ssw_test
