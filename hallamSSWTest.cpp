@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <string>
 
 #include "ssw_cpp.h"
@@ -14,12 +15,13 @@ typedef struct _AlignmentDetails {
     std::string targetSequence;
 } Details;
 
-static void readQueryAndTargets(const char* queryFile, const char* targetFile);
+static void align(const std::string& queryFileString, const std::string& targetFileString);
+static std::string readIn(const char* file); 
 static void printHeader();
 static void printDetails(const Details& details);
-static size_t computeIdentity(const Details& details); 
 
 static const char TAB = '\t';
+
 
 int main(int argc, char** argv) {
     // parse parameters
@@ -32,65 +34,70 @@ int main(int argc, char** argv) {
 
     const char* targetFile = argv[1];
     const char* queryFile = argv[2];
- 
+
     printHeader();
-    readQueryAndTargets(queryFile, targetFile);
+
+    const std::string queryString = readIn(queryFile);
+    const std::string targetString = readIn(targetFile);
+
+    align(queryString, targetString);
 }
 
-static void readQueryAndTargets(const char* queryFile, const char* targetFile) {
+// read contents of the file into a string
+static std::string readIn(const char* file) {
+    std::ifstream ifs(file);
+    std::string content( (std::istreambuf_iterator<char>(ifs) ),
+                              (std::istreambuf_iterator<char>()    ) );
+    return content;
+
+}
+
+static void align(const std::string& queryFileString, const std::string& targetFileString) {
     // read in each query sequence, run it against all target sequences
-    std::ifstream queryStream(queryFile);
+    std::string queryLine;
+    std::string queryName;
+    std::string targetName;
 
-    if(queryStream.is_open()) {
+    // convert to input streams for easy line by line parsing
+    std::istringstream queryStream(queryFileString);
 
-        std::string queryLine;
-        std::string queryName;
-        std::string targetName;
+    while (getline(queryStream, queryLine)) {
+        if (queryLine[0] == '>') {
+            queryName = queryLine.substr(1);
+        } else {
+            // looking at the sequence
+            std::string querySequence = queryLine;
+            
+            // run it against all targets
+            std::string targetLine;
+            
+            // do this reading everytiem
+            std::istringstream targetStream(targetFileString);
+      
+          while (getline(targetStream, targetLine)) {
+       
+                if (targetLine[0] == '>') {
+                    targetName = targetLine.substr(1);
+                } else {
+                    StripedSmithWaterman::Aligner aligner;
+                    StripedSmithWaterman::Filter filter;
+                    StripedSmithWaterman::Alignment alignment;
+                    
+                    std::string targetSequence = targetLine;
 
-        while (queryStream >> queryLine) {
-            if (queryLine[0] == '>') {
-                queryName = queryLine.substr(1);
-            } else {
+                    aligner.Align(querySequence.c_str(), targetSequence.c_str(), querySequence.size(), filter, &alignment);
 
-                // looking at the sequence
-                std::string querySequence = queryLine;
-                
-                // run it against all targets
-                std::string targetLine;
-
-                std::ifstream targetStream(targetFile);
-                if ( targetStream.is_open()) {
-                    while (targetStream >> targetLine) {
-                        if (targetLine[0] == '>') {
-                            targetName = targetLine.substr(1);
-                        } else {
-                
-                            StripedSmithWaterman::Aligner aligner;
-                            StripedSmithWaterman::Filter filter;
-                            StripedSmithWaterman::Alignment alignment;
-                            
-                            std::string targetSequence = targetLine;
-
-                            aligner.Align(querySequence.c_str(), targetSequence.c_str(), querySequence.size(), filter, &alignment);
-
-                            Details details;
-                            details.aln = &alignment;
-                            details.queryName = queryName;
-                            details.targetName = targetName;
-                            details.querySequence = querySequence;
-                            details.targetSequence = targetSequence;
-                           
-                            printDetails(details);
-                       } 
-                    }
-                }
-                targetStream.close();
+                    Details details;
+                    details.aln = &alignment;
+                    details.queryName = queryName;
+                    details.targetName = targetName;
+                    details.querySequence = querySequence;
+                    details.targetSequence = targetSequence;
+                   
+                    printDetails(details);
+                } 
             }
         }
-        queryStream.close();
-
-    } else {
-        std::cout << "Error opening files for reading!" << std::endl;
     }
 }
 
@@ -111,16 +118,13 @@ static void printHeader() {
     std::cout << std::endl;
 }
 
-static size_t computeIdentity(const Details& details) {
-    return 0;
-}
-
 static void printDetails(const Details& details) {
 
-    size_t identity = 0;
-    size_t gaps = 0;
     size_t alignmentSize = details.aln->ref_end - details.aln->ref_begin;
     size_t mismatches = details.aln->mismatches;
+    
+    size_t identity = 0;
+    size_t gaps = 0;
     double bitScore = 0;
     double evalue = 0;
 
