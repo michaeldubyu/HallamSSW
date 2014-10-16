@@ -438,7 +438,7 @@ static alignment_end* sw_sse2_word (const int8_t* ref,
 		pvHStore = pv;
 
 		/* inner loop to process the query sequence */
-		for (j = 0; LIKELY(j < segLen); j ++) {
+		for (j = 0; j < segLen; j ++) {
 			vH = _mm_adds_epi16(vH, _mm_load_si128(vP + j));
 
 			/* Get max from vH, vE and vF. */
@@ -784,7 +784,7 @@ s_align* ssw_align (const s_profile* prof,
 					const uint16_t filters,
 					const int32_t filterd,
 					const int32_t maskLen) {
-
+    printf("%d %d %d %d %d %d %d %d %d\n", prof, ref, refLen, weight_gapO, weight_gapE, flag, filters, filterd, maskLen);
 	alignment_end* bests = 0, *bests_reverse = 0;
 	__m128i* vP = 0;
 	int32_t word = 0, band_width = 0, readLen = prof->readLen;
