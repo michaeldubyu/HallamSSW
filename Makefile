@@ -1,7 +1,7 @@
 CC = gcc
 CXX = g++
 CFLAGS := -Wall -O3 -pipe -m64 -g#-pg
-CXXFLAGS := $(CFLAGS)  -std=c++11 
+CXXFLAGS := $(CFLAGS)
 LOBJS = ssw.o
 LCPPOBJS = ssw_cpp.o
 PROG = ssw_test

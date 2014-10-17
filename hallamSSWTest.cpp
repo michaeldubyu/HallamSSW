@@ -62,7 +62,6 @@ static void align(const std::string& queryFileString, const std::string& targetF
 
     // convert to input streams for easy line by line parsing
     std::istringstream queryStream(queryFileString);
-    int i = 0;
     while (getline(queryStream, queryLine)) {
         if (queryLine[0] == '>') {
             queryName = queryLine.substr(1);
