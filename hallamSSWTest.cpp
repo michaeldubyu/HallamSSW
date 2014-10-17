@@ -62,13 +62,13 @@ static void align(const std::string& queryFileString, const std::string& targetF
 
     // convert to input streams for easy line by line parsing
     std::istringstream queryStream(queryFileString);
-
+    int i = 0;
     while (getline(queryStream, queryLine)) {
         if (queryLine[0] == '>') {
             queryName = queryLine.substr(1);
         } else {
             // looking at the sequence
-            std::string querySequence = queryLine;
+            std::string& querySequence = queryLine;
             
             // run it against all targets
             std::string targetLine;
@@ -85,7 +85,7 @@ static void align(const std::string& queryFileString, const std::string& targetF
                     StripedSmithWaterman::Filter filter;
                     StripedSmithWaterman::Alignment alignment;
                     
-                    std::string targetSequence = targetLine;
+                    std::string& targetSequence = targetLine;
 
                     aligner.Align(querySequence.c_str(), targetSequence.c_str(), querySequence.size(), filter, &alignment);
 
@@ -97,7 +97,7 @@ static void align(const std::string& queryFileString, const std::string& targetF
                     details.targetSequence = targetSequence;
                    
                     printDetails(details);
-                } 
+               } 
             }
         }
     }
