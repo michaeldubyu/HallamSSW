@@ -8,11 +8,11 @@ PROG = ssw_test
 LIB = libssw.so
 EXAMPLE = example_c
 EXAMPLE_CPP = example_cpp
-HALLAM_TEST = hallam_SSW_test
+HALLAM_SSW= hallamSSW
 
 .PHONY: all clean
 
-all: $(PROG) $(EXAMPLE) $(EXAMPLE_CPP) $(HALLAM_TEST) $(LIB)
+all: $(PROG) $(EXAMPLE) $(EXAMPLE_CPP) $(HALLAM_SSW) $(LIB)
 
 $(LIB): ssw.c ssw.h
 	$(CC) $(CFLAGS) -fPIC -shared -rdynamic -o $@ $<
@@ -21,7 +21,7 @@ $(PROG): main.c kseq.h
 
 $(EXAMPLE): example.c
 
-$(HALLAM_TEST): hallamSSWTest.cpp $(LOBJS) $(LCPPOBJS)
+$(HALLAM_SSW): hallamSSW.cpp $(LOBJS) $(LCPPOBJS)
 	$(CXX) -o $@ $^ $(CXXFLAGS) -lm -lz
 
 $(PROG) $(EXAMPLE): $(LOBJS)
@@ -37,4 +37,4 @@ ssw_cpp.o: ssw_cpp.cpp ssw_cpp.h ssw.h
 	$(CXX) -c -o $@ $< $(CXXFLAGS)
 
 clean:
-	-rm -f $(LOBJS) $(LCPPOBJS) $(PROG) $(LIB) $(HALLAM_TEST) $(EXAMPLE) $(EXAMPLE_CPP) *~
+	-rm -f $(LOBJS) $(LCPPOBJS) $(PROG) $(LIB) $(HALLAM_SSW) $(EXAMPLE) $(EXAMPLE_CPP) *~
