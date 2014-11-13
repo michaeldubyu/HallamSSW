@@ -68,7 +68,7 @@ static void align(const std::string& queryFileString, const std::string& targetF
     while (getline(queryStream, queryLine)) {
         if (queryLine[0] == '>') {
             queryName = queryLine.substr(1);
-        } else {
+        } else if (!queryLine.empty()) {
             // looking at the sequence
             std::string& querySequence = queryLine;
 
@@ -83,7 +83,7 @@ static void align(const std::string& queryFileString, const std::string& targetF
 
                 if (targetLine[0] == '>') {
                     targetName = targetLine.substr(1);
-                } else {
+                } else if (!targetLine.empty()) {
                     StripedSmithWaterman::Aligner aligner;
                     StripedSmithWaterman::Filter filter;
                     StripedSmithWaterman::Alignment alignment;
